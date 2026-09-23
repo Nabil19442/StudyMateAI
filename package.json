@@ -1,0 +1,29 @@
+{
+  "name": "studymate-ai",
+  "version": "1.0.0",
+  "description": "StudyMate AI - Your Personal AI Study Assistant for university students",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "server": "npm start --prefix server",
+    "server:dev": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"magenta,cyan\" \"npm run server:dev\" \"npm run client\"",
+    "build:client": "npm run build --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "keywords": [
+    "ai",
+    "chatbot",
+    "studymate",
+    "huggingface",
+    "education",
+    "express",
+    "react",
+    "tailwind"
+  ],
+  "author": "StudyMate Team",
+  "license": "MIT"
+}

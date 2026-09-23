@@ -1,0 +1,25 @@
+{
+  "name": "studymate-server",
+  "version": "1.0.0",
+  "description": "Backend API server for StudyMate AI using Express and Hugging Face Inference SDK",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@huggingface/inference": "^4.13.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
+    "express": "^4.21.2"
+  },
+  "keywords": [
+    "express",
+    "huggingface",
+    "studymate",
+    "ai"
+  ],
+  "author": "StudyMate Team",
+  "license": "MIT"
+}
