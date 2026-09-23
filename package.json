@@ -4,14 +4,17 @@
   "description": "StudyMate AI - Your Personal AI Study Assistant for university students",
   "type": "module",
   "private": true,
+  "workspaces": [
+    "client"
+  ],
   "scripts": {
-    "build": "npm run build --prefix client",
+    "build": "npm run build --workspace=client",
     "install:all": "npm install && npm install --prefix server && npm install --prefix client",
     "server": "npm start --prefix server",
     "server:dev": "npm run dev --prefix server",
     "client": "npm run dev --prefix client",
     "dev": "concurrently -n \"SERVER,CLIENT\" -c \"magenta,cyan\" \"npm run server:dev\" \"npm run client\"",
-    "build:client": "npm run build --prefix client"
+    "build:client": "npm run build --workspace=client"
   },
   "dependencies": {
     "@huggingface/inference": "^4.13.1",

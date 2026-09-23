@@ -2,9 +2,9 @@ import { InferenceClient } from "@huggingface/inference";
 import path from "path";
 import dotenv from "dotenv";
 
-// Load environment variables locally if not already injected by platform
 dotenv.config();
 if (!process.env.HF_TOKEN) {
+  dotenv.config({ path: path.resolve(process.cwd(), "..", "server", ".env") });
   dotenv.config({ path: path.resolve(process.cwd(), "server", ".env") });
 }
 
@@ -37,12 +37,9 @@ function formatMessages(raw) {
 }
 
 /**
- * Vercel Serverless Function for POST /api/chat
- * Handles incoming chat messages, validates requests,
- * and calls the Hugging Face Inference API.
+ * Vercel Serverless Function for POST /api/chat (client subdirectory)
  */
 export default async function handler(req, res) {
-  // 1. Enable Cross-Origin Resource Sharing (CORS) headers
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,PATCH,DELETE,POST,PUT");
@@ -52,12 +49,10 @@ export default async function handler(req, res) {
   );
   res.setHeader("Content-Type", "application/json");
 
-  // Handle preflight OPTIONS request
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // Only allow POST requests for chat
   if (req.method !== "POST") {
     return res.status(405).json({
       error: `Method ${req.method} not allowed. Please use POST.`,
@@ -65,18 +60,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 2. Parse request payload safely
     const body = typeof req.body === "string" ? JSON.parse(req.body) : (req.body || {});
     const { messages } = body;
 
-    // 3. Validation: Check if messages array exists and is not empty
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({
         error: "Invalid request: 'messages' must be a non-empty array of message objects.",
       });
     }
 
-    // 4. Validation: Check if last message contains non-empty text content
     const lastMessage = messages[messages.length - 1];
     if (
       !lastMessage ||
@@ -89,7 +81,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // 5. Check Hugging Face Token
     const token = process.env.HF_TOKEN;
     if (
       !token ||
@@ -99,11 +90,10 @@ export default async function handler(req, res) {
     ) {
       return res.status(401).json({
         error:
-          "Hugging Face API token is missing or not configured. For local development, set HF_TOKEN in server/.env. For Vercel deployment, add HF_TOKEN in your Vercel Project Settings > Environment Variables.",
+          "Hugging Face API token is missing or not configured. Please add `HF_TOKEN` in your Vercel Project Settings > Environment Variables.",
       });
     }
 
-    // 6. Call Hugging Face chat completion
     const model = process.env.HF_MODEL || "openai/gpt-oss-120b";
     const client = new InferenceClient(token);
 
@@ -125,7 +115,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // 7. Return successful JSON reply
     return res.status(200).json({
       reply,
     });
