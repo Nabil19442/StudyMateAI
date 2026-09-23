@@ -12,8 +12,15 @@ export default function SettingsModal({ isOpen, onClose, onClearAllChats }) {
   useEffect(() => {
     if (isOpen) {
       setLoading(true);
-      fetch("/api/health")
-        .then((res) => res.json())
+      const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+      fetch(`${API_BASE_URL}/api/health`)
+        .then(async (res) => {
+          const contentType = res.headers.get("content-type") || "";
+          if (contentType.includes("application/json")) {
+            return res.json();
+          }
+          throw new Error(`Non-JSON response (HTTP ${res.status})`);
+        })
         .then((data) => {
           setServerInfo(data);
           setLoading(false);
@@ -79,7 +86,7 @@ export default function SettingsModal({ isOpen, onClose, onClearAllChats }) {
                 </span>
               ) : (
                 <span className="flex items-center gap-1 text-rose-500 font-semibold">
-                  <AlertCircle className="w-3.5 h-3.5" /> Missing in server/.env
+                  <AlertCircle className="w-3.5 h-3.5" /> Not Configured
                 </span>
               )}
             </div>
@@ -113,12 +120,11 @@ export default function SettingsModal({ isOpen, onClose, onClearAllChats }) {
                 </a>
               </li>
               <li>
-                Open the file: <code className="bg-white px-1.5 py-0.5 rounded border border-purple-200 font-mono text-[11px]">server/.env</code>
+                <strong>Local Dev:</strong> Add to <code className="bg-white px-1.5 py-0.5 rounded border border-purple-200 font-mono text-[11px]">server/.env</code> as <code className="bg-white px-1.5 py-0.5 rounded border border-purple-200 font-mono text-[11px]">HF_TOKEN=hf_...</code>
               </li>
               <li>
-                Paste your token: <code className="bg-white px-1.5 py-0.5 rounded border border-purple-200 font-mono text-[11px]">HF_TOKEN=hf_...</code>
+                <strong>Vercel Production:</strong> Add <code className="bg-white px-1.5 py-0.5 rounded border border-purple-200 font-mono text-[11px]">HF_TOKEN</code> in your Vercel Dashboard under <em>Settings &gt; Environment Variables</em>.
               </li>
-              <li>Restart the server and ask away!</li>
             </ol>
           </div>
 

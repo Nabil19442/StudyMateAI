@@ -146,8 +146,9 @@ export default function App() {
     setLoading(true);
 
     try {
-      // Send conversation history to backend Express API
-      const response = await fetch("/api/chat", {
+      // Send conversation history to backend API (supports relative /api/chat or custom VITE_API_URL)
+      const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -160,11 +161,35 @@ export default function App() {
         }),
       });
 
-      const data = await response.json();
+      // Safely inspect Content-Type before parsing JSON to prevent "Unexpected token" errors
+      const contentType = response.headers.get("content-type") || "";
+      let data = null;
+
+      if (contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error(
+              "API endpoint /api/chat not found (404). Please verify that Vercel has deployed the /api serverless functions or check your VITE_API_URL."
+            );
+          }
+          if (response.status === 504 || response.status === 502) {
+            throw new Error(
+              `AI service timed out (HTTP ${response.status}). The model is likely cold-starting. Please wait 15 seconds and try again.`
+            );
+          }
+          throw new Error(
+            `Server error (HTTP ${response.status}): ${text.slice(0, 100)}`
+          );
+        }
+        throw new Error("Received an unexpected non-JSON response from server.");
+      }
 
       if (!response.ok) {
         throw new Error(
-          data.error || "Failed to receive response from StudyMate AI backend."
+          data?.error || "Failed to receive response from StudyMate AI backend."
         );
       }
 

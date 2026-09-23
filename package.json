@@ -2,14 +2,20 @@
   "name": "studymate-ai",
   "version": "1.0.0",
   "description": "StudyMate AI - Your Personal AI Study Assistant for university students",
+  "type": "module",
   "private": true,
   "scripts": {
+    "build": "npm run build --prefix client",
     "install:all": "npm install && npm install --prefix server && npm install --prefix client",
     "server": "npm start --prefix server",
     "server:dev": "npm run dev --prefix server",
     "client": "npm run dev --prefix client",
     "dev": "concurrently -n \"SERVER,CLIENT\" -c \"magenta,cyan\" \"npm run server:dev\" \"npm run client\"",
     "build:client": "npm run build --prefix client"
+  },
+  "dependencies": {
+    "@huggingface/inference": "^4.13.1",
+    "dotenv": "^17.3.1"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
@@ -22,7 +28,8 @@
     "education",
     "express",
     "react",
-    "tailwind"
+    "tailwind",
+    "vercel"
   ],
   "author": "StudyMate Team",
   "license": "MIT"

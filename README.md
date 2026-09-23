@@ -157,6 +157,15 @@ HF_MODEL=openai/gpt-oss-120b
 
 > ⚠️ **Important Security Rule**: Never share your token, and never commit `server/.env` to GitHub. It is already added to `.gitignore`.
 
+### For Vercel Production Deployment:
+1. In your [Vercel Dashboard](https://vercel.com/dashboard), open your **StudyMate AI** project.
+2. Go to **Settings** → **Environment Variables**.
+3. Add a new variable:
+   - **Key**: `HF_TOKEN`
+   - **Value**: your actual token (starts with `hf_...`)
+   - **Environment**: Check *Production*, *Preview*, and *Development*.
+4. Click **Save** and trigger a **Redeploy**.
+
 ---
 
 ## 8. How to Run the Application

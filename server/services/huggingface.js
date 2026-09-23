@@ -1,8 +1,12 @@
 import { InferenceClient } from "@huggingface/inference";
+import path from "path";
 import dotenv from "dotenv";
 
-// Load environment variables from .env file
+// Load environment variables from .env or server/.env
 dotenv.config();
+if (!process.env.HF_TOKEN) {
+  dotenv.config({ path: path.resolve(process.cwd(), "server", ".env") });
+}
 
 /**
  * System Prompt defines StudyMate AI's personality, teaching philosophy,
@@ -60,9 +64,14 @@ export async function generateChatReply(messages) {
   const token = process.env.HF_TOKEN;
 
   // Check if token is missing or still set to the default placeholder
-  if (!token || token === "your_huggingface_token" || token.trim() === "") {
+  if (
+    !token ||
+    token === "your_huggingface_token" ||
+    token === "your_huggingface_token_here" ||
+    token.trim() === ""
+  ) {
     const error = new Error(
-      "Hugging Face API token is missing or not configured. Please add your token in `server/.env` as `HF_TOKEN=your_token`. Get a free token at https://huggingface.co/settings/tokens"
+      "Hugging Face API token is missing or not configured. For local development, set HF_TOKEN in `server/.env`. For Vercel deployment, add `HF_TOKEN` in your Vercel Project Settings > Environment Variables."
     );
     error.statusCode = 401;
     throw error;
